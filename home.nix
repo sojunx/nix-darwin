@@ -10,6 +10,10 @@
     cargo
     nil
     nixfmt
+
+    ripgrep
+    fd
+    unzip
   ];
   home.file.".hushlogin".text = "";
 
@@ -55,12 +59,10 @@
     ghostty = {
       enable = true;
       package = null;
-      enableZshIntegration = true;
       settings = {
         theme = "jellybeans";
         font-family = "JetBrainsMono Nerd Font";
-        font-style = "Bold";
-        font-size = 14;
+        font-size = 15;
         background-opacity = 0.75;
         background-blur-radius = 30;
         macos-titlebar-proxy-icon = "hidden";
@@ -125,6 +127,74 @@
       };
     };
 
+    tmux = {
+      enable = true;
+      mouse = true;
+      prefix = "C-a";
+      keyMode = "vi";
+      terminal = "tmux-256color";
+      escapeTime = 0;
+      baseIndex = 1;
+
+      plugins = with pkgs.tmuxPlugins; [
+        vim-tmux-navigator
+        {
+          plugin = yank;
+          extraConfig = ''
+            set -g @yank_selection_mouse 'clipboard'
+          '';
+        }
+        {
+          plugin = catppuccin;
+          extraConfig = ''
+            set -g @catppuccin_window_status_style "basic"
+            set -g @catppuccin_window_current_text_color "#{@thm_surface_1}"
+            set -g @catppuccin_window_current_number_color "#{@thm_peach}"
+            set -g @catppuccin_window_current_text "#[bg=#{@thm_mantle}] #{b:pane_current_path}"
+            set -g @catppuccin_window_text " #W"
+            set -g @catppuccin_window_default_text "#W"
+            set -g @catppuccin_window_number_color "#{@thm_lavender}"
+          '';
+        }
+      ];
+
+      extraConfig = ''
+        # True color
+        set -ag terminal-overrides ",xterm-256color:RGB"
+
+        # Prefix
+        bind-key C-a send-prefix
+
+        # Reload config
+        unbind r
+        bind r source-file ~/.config/tmux/tmux.conf
+
+        # Resize panes
+        bind -r j resize-pane -D 5
+        bind -r k resize-pane -U 5
+        bind -r h resize-pane -L 5
+        bind -r l resize-pane -R 5
+        bind -r m resize-pane -Z
+
+        # Splits
+        unbind %
+        bind '\' split-window -h -c '#{pane_current_path}'
+        unbind '"'
+        bind - split-window -v -c '#{pane_current_path}'
+        bind c new-window -c '#{pane_current_path}'
+        bind -r v split-window -h -c "#{pane_current_path}" "zsh -c 'nvim; exec zsh'"
+
+        # Windows
+        set-option -g renumber-windows on
+
+        # Status bar
+        set -g status-left ""
+        set -g status-right "#{E:@catppuccin_status_application} #{E:@catppuccin_status_session}"
+        set -g window-status-separator ""
+        set -g status-style bg=default
+      '';
+    };
+
     zoxide = {
       enable = true;
       enableZshIntegration = true;
@@ -141,6 +211,15 @@
         plugins = [ "git" ];
       };
 
+      history = {
+        path = "$HOME/.zhistory";
+        save = 1000;
+        size = 999;
+        share = true;
+        expireDuplicatesFirst = true;
+        ignoreDups = true;
+      };
+
       shellAliases = {
         cat = "bat --style=numbers --color=always";
         ls = "eza";
@@ -149,6 +228,16 @@
         vim = "nvim";
         vi = "nvim";
       };
+
+      initContent = ''
+        setopt hist_verify
+
+        # Keymap
+        bindkey '[C' forward-word
+        bindkey '[D' backward-word
+        bindkey '^[[A' history-search-backward
+        bindkey '^[[B' history-search-forward
+      '';
     };
   };
 
