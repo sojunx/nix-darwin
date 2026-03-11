@@ -99,6 +99,19 @@
       };
     };
 
+    direnv = {
+      enable = true;
+      nix-direnv.enable = true;
+
+      # direnv.toml — tweak warn timeout, etc.
+      config = {
+        global = {
+          warn_timeout = "30s";
+          hide_env_diff = true; # show what env vars changed
+        };
+      };
+    };
+
     eza = {
       enable = true;
       git = true;
@@ -227,6 +240,7 @@
         la = "eza -la";
         vim = "nvim";
         vi = "nvim";
+        "nix-rebuild" = "sudo darwin-rebuild switch --flake";
       };
 
       initContent = ''
