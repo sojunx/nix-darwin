@@ -1,8 +1,11 @@
 { pkgs, inputs, ... }:
+
 {
   environment.systemPackages = with pkgs; [
     wget
     curl
+    tree
+    docker
   ];
 
   security.pam.services.sudo_local.touchIdAuth = true;
@@ -19,6 +22,25 @@
     configurationRevision = inputs.self.rev or inputs.self.dirtyRev or null;
 
     primaryUser = "sojunx";
+
+    defaults = {
+      dock = {
+        autohide = true;
+        minimize-to-application = true;
+        show-recents = false;
+        tilesize = 48;
+        persistent-apps = [
+          "/System/Applications/Launchpad.app"
+          "/Applications/Arc.app"
+          "/Applications/Obsidian.app"
+          "/Applications/Discord.app"
+          "/System/Applications/Music.app"
+          "/Applications/Visual Studio Code.app"
+          "/Applications/Ghostty.app"
+          "/Applications/Apidog.app"
+        ];
+      };
+    };
   };
 
   homebrew = {
@@ -36,6 +58,8 @@
       "visual-studio-code"
       "raycast"
       "ghostty"
+      "obsidian"
+      "apidog"
       "font-fira-code"
       "font-fira-code-nerd-font"
       "font-jetbrains-mono"
