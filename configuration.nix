@@ -6,6 +6,8 @@
     curl
     tree
     docker
+    colima
+    docker-compose
   ];
 
   security.pam.services.sudo_local.touchIdAuth = true;
